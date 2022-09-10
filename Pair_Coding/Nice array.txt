@@ -1,0 +1,286 @@
+// Nice Array (7kyu)
+let problemInput = [2, 10, 9, 3, 15]
+
+
+// ********************************* Mai's solutions *********************************
+// Solution 1
+/* My tactics is below
+1) Sort the array
+2) make a nested array 
+   each array has numbers which difference is one
+3) confirm whether there is one nested array which length is one
+    => the result will be false
+*/
+
+const isNiceMai1 = (arr) =>{
+    let sortedArr = arr.sort((a,b) => a-b); // => [2,3,9,10,15]
+    let newArr = []
+    // Initialize
+    let nestedArr = [arr[0]];
+    for (let i = 0 ; i < sortedArr.length-1 ; i++){
+      if (sortedArr[i+1] - sortedArr[i] === 1){
+        nestedArr.push(sortedArr[i+1]);
+      } else {
+        newArr.push(nestedArr);
+        nestedArr = [sortedArr[i+1]];
+      }
+    }
+    
+    // Push the item of last index
+    newArr.push(nestedArr); // => [[2,3],[9,10],[15]]
+    
+    // If there is an array with one length => false
+    let result = true;
+    newArr.forEach(element => {
+      if (element.length === 1){
+        result = false;
+      }
+    });
+    return result;
+  }
+
+// Solution 2 ---------------------------------------------------------------
+/* My tactics is below
+1) Sort the array
+2) Check if the array is empty
+    => the result will be false
+3) Check the last item and the second from the last item 
+   If the difference is not one
+    => the result will be false
+4) Check if false appear twice in a row
+    => the result will be false
+*/
+
+const isNiceMai2 = (arr) =>{
+    let sortedArr = arr.sort((a,b) => a-b);
+    let resultArr =[];
+    
+    // Check the arr.length
+    if (arr.length ===0){
+      return false;
+    }
+  
+    // Check the last item and the second from the last item
+    if (sortedArr[sortedArr.length-1] - sortedArr[sortedArr.length-2] !== 1){
+      return false;
+    }
+  
+    for (let i = 0; i<sortedArr.length-1 ; i++){
+        if (sortedArr[i+1] - sortedArr[i] === 1){
+          resultArr.push(true)
+        } else {
+          // check the last item
+          if(resultArr[resultArr.length-1] === false){
+            // finish the loop
+            return false;
+          }
+          return false
+        }
+    }
+    return true;
+  }
+
+  
+// ********************************* Mochi's solutions *********************************
+// Solution 1
+/* My tactics is below
+1) Make a working set of the array (so [2,2,2,3] will just be {2,3})
+2) For every value of the set, delete, if present, all of the n + 1 values, 
+   then all of the n -1
+3) if no n+1 or n-1 was found 
+  => return false, as there is at least one number without siblings
+4) if there were no problems 
+  => return true
+*/
+
+const isNiceMochi1 = (arr) => {
+  let workingSet = new Set(arr)
+
+  // let times = 0
+  for (let element of workingSet) {
+    // times++
+    // console.log(`Times ${times}`)
+
+    let deleted = 0
+    /* Set.prototype.delete removes the value from the set. 
+    It returns:
+    => true if the value was in the set and has been removed
+    => false if the value was not in the set (and so, it couldn't be removed)
+    */
+
+    // Delete all n+1 in sequence
+    for (let currentNumber = element;
+      workingSet.delete(currentNumber + 1);
+      currentNumber++, deleted ++);
+
+    // Delete all n-1 in sequence
+    for (let currentNumber = element;
+      workingSet.delete(currentNumber - 1);
+      currentNumber--, deleted ++);
+
+    if (deleted) workingSet.delete(element)
+    else return false
+  }
+  
+  return true
+  }
+
+/*
+Interesting findings: 
+1) Both when using forEach and other loops, if the working array/set/object change 
+  (one of their values gets deleted, added etc.), the forEach/loop will be shorter or longer.
+  You can uncomment the "times" variable and "console.log(`Times ${times}`)" 
+  to see that the for loop only processes some elements of the set, 
+  because the others have been deleted.
+
+2) When using for loops without a sentence block/function's body {}, it's important to add the
+   Semicolumn ; to tell the console that the for loop ends there, without a body.
+   I didn't add them at first, and the second for loop would not work as expected.
+   That was because the compiler thought that the if, else part was part of the for loop.
+
+   This is like when you do not use the {} because there is only one operation:
+   Example:
+   (a,b) => a+b INSTEAD OF (a,b) => {return a+b} 
+   
+   This made me understand the problem: https://www.codingem.com/javascript-semicolon-usage/
+*/
+
+// Solution 2 ---------------------------------------------------------------
+/* My tactics is below
+1) Make a working set of the array
+
+2) Transform the set to an array, so that it can be sorted in a descending order 
+   (sets do not store order)
+
+3) Have a for loop that iterates over the array's element in which:
+   i = index
+   currentDifference = arr[i-1] - arr[i]
+   previousDifference = difference of the numbers that came before, so arr[i-2], arr[i-1]
+
+   if currentDifference and the previousDifference are != 1,
+   => return false
+   because there is a number for which both of its neighbors are further than 1.
+
+   example:
+   [4,3,2,1] OK    
+   4 --(-1)--> 3 --(-1)--> 2 etc
+   Because the previousDifference is 1, 
+   the currentDifference is also 1
+
+   [5,4,2,1] OK    
+   5 --(-1)--> 4 --(-2)--> 2 --(-1)--> 1 
+   Because the previousDifference is 1 
+   and curretDifference is 2 (but the next difference will be 1)
+   
+   [10,9,7,4,3,2,1] NOT OK    
+   9 --(-2)--> 7 --(-3)--> 4
+   Because the previousDifference is 2, and the currentDifference is 3.
+
+4) if there were no problems 
+  => return true
+*/
+
+const isNiceMochi2 = (arr) => {
+  // ********** ORIGINAL SETUP ***********
+  // let workingSet = new Set(arr)
+  // let workingArray = []
+  // workingSet.forEach(element => workingArray.push(element))
+  // workingArray.sort((a,b) => b-a)
+
+  // ********** FIXED SETUP ***********
+  let workingArray = arr.sort((a,b) => b-a) 
+  // END OF SETUP
+
+  let lastDifference = NaN
+
+  for (let i = 1; i < workingArray.length; i++) {
+    let currentDifference = workingArray[i-1]  - workingArray[i]  
+
+    // console.log(`Differences: ${currentDifference}, ${lastDifference}`)
+    if (currentDifference != 1 && lastDifference != 1) return false
+
+    lastDifference = currentDifference 
+  }
+  return true
+}
+
+
+// ********************************* Functions testing *********************************
+
+function testFunction(yourFunction) {
+  console.log(`Testing ${yourFunction.name}...`)
+  let finalMessage = ""
+
+  const testArrays = [[[2, 10, 9, 3, 15], false],
+                [[4,1,2,3,5,6,7], true],
+                [[10,9,8,1,2,3,5], false],
+                [[1,2,3,6,8,9], false],
+                [[11,2,4,5,3,10], true]]
+  
+  // ************** Uncomment for heavy tests ************** 
+  // let veryLongArray = []
+  // for (i = 0; i < 2000000; i++) {
+  //   veryLongArray.push(i)
+  // }
+  // testArrays.push([veryLongArray, true])
+
+  // let longArrayWithRepetition = []
+  // for (i = 0; i < 20000; i++) {
+  //   longArrayWithRepetition = longArrayWithRepetition.concat([1,2,4,5,6,8,9,10])
+  // }
+  // testArrays.push([longArrayWithRepetition, true])
+
+  // ************** Testing part **************
+  let startTime = Date.now()
+  for (let [array, solution] of testArrays) {
+    if (yourFunction(array) != solution) {
+    finalMessage += `Failed the test with this array: ${array.slice(0,11)} (first ten numbers)...\nthe result should be "${solution}"\n`
+  }
+  }
+  let finishTime = Date.now() - startTime;
+  
+  console.log(`The computing time was ${finishTime}.`)
+
+  if (!finalMessage) return "No errors found.\n"
+  else return finalMessage
+}
+
+// ********************************* End of testing *********************************
+
+console.log(testFunction(isNiceMai1))
+console.log(testFunction(isNiceMai2))
+console.log(testFunction(isNiceMochi1))
+console.log(testFunction(isNiceMochi2))
+
+/*
+Leaderboard:
+1. Mai1
+2. Mai2
+3. Mochi2
+4. Mochi1
+
+After fixing mochi2, to not account for repetition, or fixing Mai1 and Mai2 for repetition:
+1. Mochi2
+2. Mai1
+3. Mai2
+4. Mochi1
+
+My assumptions on the results:
+I think Mochi2 is the fastest as it doesn't modify any array, but gets the solution based on 
+just two values.
+It works very similarly to Mai2; I think the array instead of using two values is what
+makes it slightly slower.
+
+I was surprised to notice that Mochi1 was the slowest. I think it might be because sets
+are like Object, so deleting a property could take a bit of time, making it the slowest.
+
+Apparently, it's faster to transform to set and then transform back to array, instead
+of working on a set (sets might be especially precious when working with strings, over arrays).
+
+I was also surprised to see that Mai1 was faster than Mai2.
+
+In the real world, those differences do not matter, as all of the solutions solve
+the problem in under a second, but it was very funny to do this small research. 
+I hope you also learnt something new.
+Thank you.
+*/
