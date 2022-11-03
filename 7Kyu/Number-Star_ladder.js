@@ -6,7 +6,7 @@
 1**3
 */
 
-function pattern1(n) {
+function pattern(n) {
     return [...Array(n)]
         .map((_, index) => index + 1)
         .map(item => item === 1 ? 1 : "1" + "*".repeat(item - 1) + item)
