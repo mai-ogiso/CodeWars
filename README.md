@@ -2,7 +2,7 @@
 
 ![image](https://user-images.githubusercontent.com/95740190/202867905-f16c8f6f-8be4-444f-8771-8cc2d298f666.png)
 
-A repository filled with codewars challenges (kata). Currently Ranked #127,712 on the global leaderboard. Completed over 100+ challenges.
+A repository filled with codewars challenges (kata). Completed over 100+ challenges.
 
 ## How It's Made:
 
@@ -16,6 +16,6 @@ I consistently refactor and optimize my code, sometimes for efficiency, and some
 
 ## Lessons Learned:
 
-The Biggest Lesson I learned in tackling this endless supply of questions is understanding that there is a long way to go. 
+There is a long way to go. 
   
 I'm always inspired by the answers which seem more efficient or clearer than mine and I try to polish my code.
